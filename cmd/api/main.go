@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"time"
+
+	_ "github.com/lib/pq"
 )
 
 type Config struct {
@@ -17,11 +17,16 @@ type Config struct {
 
 func main() {
 	log.Println("Starting authentication service...")
+	var err error
 
-	connection := connectToDB()
-	if connection == nil {
-		log.Panic("Can't connect to Postgres!")
+	connection, err := connectToDB()
+	if err != nil {
+		log.Println("\nCan't connect to Postgres!")
+		panic(err)
+		return
 	}
+
+	log.Print("Connected to Progres!!\n\n")
 
 	// Set up config
 	app := Config{
@@ -34,7 +39,7 @@ func main() {
 		Handler: app.routes(),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -55,27 +60,14 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-func connectToDB() *sql.DB {
-	counts := 0
-	dsn := os.Getenv("DSN")
+func connectToDB() (*sql.DB, error) {
+	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s sslmode=disable", host, port, user, password, dbname)
 
-	for {
-		connection, err := openDB(dsn)
-		if err != nil {
-			log.Println("Postgres not yet ready ...")
-			counts++
-		} else {
-			log.Println("Connected to Postgres!")
-			return connection
-		}
-
-		if counts > 10 {
-			log.Println(err)
-			return nil
-		}
-
-		log.Println("Backing off for two seconds...")
-		time.Sleep(2 * time.Second)
-		continue
+	db, err := sql.Open("postgres", psqlconn)
+	if err != nil {
+		return nil, err
 	}
+	defer db.Close()
+
+	return db, nil
 }
