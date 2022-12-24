@@ -6,8 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgconn"
+	_ "github.com/jackc/pgx/v4"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type Config struct {
@@ -20,13 +24,13 @@ func main() {
 	var err error
 
 	connection, err := connectToDB()
-	if err != nil {
-		log.Println("\nCan't connect to Postgres!")
+	if connection == nil {
+		log.Println("\nCouldn't connect to Postgres!")
 		panic(err)
 		return
 	}
 
-	log.Print("Connected to Progres!!\n\n")
+	log.Print("Connected to Postgres!!\n\n")
 
 	// Set up config
 	app := Config{
@@ -61,13 +65,23 @@ func openDB(dsn string) (*sql.DB, error) {
 }
 
 func connectToDB() (*sql.DB, error) {
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s sslmode=disable", host, port, user, password, dbname)
+	counts := 0
+	dsn := os.Getenv("DSN")
 
-	db, err := sql.Open("postgres", psqlconn)
-	if err != nil {
-		return nil, err
+	for {
+		connection, err := openDB(dsn)
+		if connection != nil {
+			return connection, nil
+		}
+		counts++
+
+		if counts > dbMaxAttempts {
+			log.Println(err)
+			return nil, err
+		}
+
+		log.Println("Retrying connect in two seconds...")
+		time.Sleep(2 * time.Second)
+		continue
 	}
-	defer db.Close()
-
-	return db, nil
 }
