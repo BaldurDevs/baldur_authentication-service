@@ -4,6 +4,7 @@ import (
 	"authentication/data"
 	"database/sql"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
@@ -65,8 +66,9 @@ func openDB(dsn string) (*sql.DB, error) {
 }
 
 func connectToDB() (*sql.DB, error) {
-	counts := 0
+	godotenv.Load(".env")
 	dsn := os.Getenv("DSN")
+	counts := 0
 
 	for {
 		connection, err := openDB(dsn)
