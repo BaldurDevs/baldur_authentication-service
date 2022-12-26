@@ -28,6 +28,9 @@ func run(port string) error {
 	pingHandler := rest.PingHandlerFactory()
 	pingHandler.RegisterRoutes(router)
 
+	authHandler := rest.AuthHandlerFactory()
+	authHandler.RegisterRouters(router)
+
 	log.Info("run application...")
 	return router.Run(":" + port)
 }
