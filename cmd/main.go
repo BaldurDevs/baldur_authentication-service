@@ -23,9 +23,10 @@ func main() {
 
 func run(port string) error {
 	log.Info("loading routes")
-
 	router := gin.Default()
+
 	pingHandler := rest.PingHandlerFactory()
+	pingHandler.RegisterRoutes(router)
 
 	log.Info("run application...")
 	return router.Run(":" + port)
