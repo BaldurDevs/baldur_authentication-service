@@ -26,7 +26,7 @@ func run(port string) error {
 	router := gin.Default()
 
 	pingHandler := rest.PingHandlerFactory()
-	pingHandler.RegisterRoutes(router)
+	pingHandler.RegisterRouters(router)
 
 	authHandler := rest.AuthHandlerFactory()
 	authHandler.RegisterRouters(router)

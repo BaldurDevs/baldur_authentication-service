@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"authentication/internal/core/gateway/dto"
 	"authentication/internal/core/usecase/user"
 	"authentication/internal/entrypoints/handler/contracts"
 	"encoding/json"
@@ -9,18 +8,19 @@ import (
 	"net/http"
 )
 
-func AuthHandlerFactory() AuthHandler {
-	return NewAuthHandler()
+func AuthHandlerFactory() *AuthHandler {
+	return NewAuthHandler(
+		user.AuthenticateUserFactory(),
+	)
 }
 
-func NewAuthHandler() AuthHandler {
-	return AuthHandler{
-		authenticateUser: user.AuthenticateUserFactory(),
+func NewAuthHandler(authUser user.AuthenticateUser) *AuthHandler {
+	return &AuthHandler{
+		authenticateUser: authUser,
 	}
 }
 
 type AuthHandler struct {
-	autoMapper       automapper.AutoMapper
 	authenticateUser user.AuthenticateUser
 }
 
@@ -37,17 +37,13 @@ func (handler *AuthHandler) authenticate(c *gin.Context) {
 		return
 	}
 
-	var userData dto.UserAuthData
-
-	// TODO: Mappear authUserRequest --> userData
-
-	authResult, err := handler.authenticateUser.Execute(c, &userData)
+	err = handler.authenticateUser.Execute(c, authUserRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, authResult)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 func (handler *AuthHandler) getUserDataFromRequest(c *gin.Context) (*contracts.AuthUserRequest, error) {
