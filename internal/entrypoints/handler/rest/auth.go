@@ -37,10 +37,14 @@ func (handler *AuthHandler) authenticate(c *gin.Context) {
 		return
 	}
 
-	err = handler.authenticateUser.Execute(c, authUserRequest)
+	result, err := handler.authenticateUser.Execute(c, authUserRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
 		return
+	}
+
+	if !result {
+		c.JSON(http.StatusUnauthorized, map[string]any{"message": "wrong email or password"})
 	}
 
 	c.JSON(http.StatusNoContent, nil)
