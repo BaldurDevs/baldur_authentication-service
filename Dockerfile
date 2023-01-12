@@ -1,7 +1,6 @@
-FROM golang:1.19-alpine
+FROM alpine:latest
 
 RUN mkdir /app
-RUN go build -o authApp ./cmd/main.go
 
 COPY authApp /app
 
