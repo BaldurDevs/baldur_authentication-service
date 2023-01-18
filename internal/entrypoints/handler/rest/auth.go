@@ -1,11 +1,13 @@
 package rest
 
 import (
+	"encoding/json"
+	"net/http"
+
 	"authentication/internal/core/usecase/user"
 	"authentication/internal/entrypoints/handler/contracts"
-	"encoding/json"
+
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func AuthHandlerFactory() *AuthHandler {
@@ -29,7 +31,6 @@ func (handler *AuthHandler) RegisterRouters(r *gin.Engine) {
 }
 
 func (handler *AuthHandler) authenticate(c *gin.Context) {
-
 	authUserRequest, err := handler.getUserDataFromRequest(c)
 	if err != nil {
 		// TODO: errorHandler
