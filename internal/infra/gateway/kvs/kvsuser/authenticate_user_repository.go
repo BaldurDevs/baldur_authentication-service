@@ -1,10 +1,13 @@
 package kvsuser
 
 import (
+	"context"
+	"encoding/base64"
+
 	"authentication/internal/core/gateway"
 	"authentication/internal/core/gateway/dto"
 	"authentication/internal/infra/gateway/kvs/config"
-	"context"
+
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -12,22 +15,15 @@ func NewAuthenticationUserRepository() gateway.AuthenticationUserRepository {
 	return &authenticationUserRepository{}
 }
 
-type authenticationUserRepository struct {
-}
+type authenticationUserRepository struct{}
 
 func (repository *authenticationUserRepository) Execute(userAuthData *dto.UserAuthData) (bool, error) {
-
 	entity, err := repository.retrieveUser(userAuthData.Email)
 	if err != nil {
 		return false, err
 	}
 
-	result, err := repository.PasswordMatches(entity.Password, userAuthData.Password)
-	if err != nil {
-		return false, err
-	}
-
-	return result, nil
+	return repository.passwordMatches(entity.Password, userAuthData.Password), nil
 }
 
 func (repository *authenticationUserRepository) retrieveUser(email string) (*dto.UserAuthData, error) {
@@ -48,7 +44,6 @@ func (repository *authenticationUserRepository) retrieveUser(email string) (*dto
 	return &userData, nil
 }
 
-func (repository *authenticationUserRepository) PasswordMatches(storagePassword string, receivedPassword string) (bool, error) {
-	// TODO: Codificar la contraseña en base64
-	return storagePassword == receivedPassword, nil
+func (repository *authenticationUserRepository) passwordMatches(storagePassword string, receivedPassword string) bool {
+	return storagePassword == base64.StdEncoding.EncodeToString([]byte(receivedPassword))
 }

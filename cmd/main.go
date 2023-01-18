@@ -1,11 +1,12 @@
 package main
 
 import (
+	"os"
+
 	"authentication/internal/entrypoints/handler/rest"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func main() {

@@ -3,11 +3,12 @@ package config
 import (
 	"context"
 	"errors"
+	"log"
+	"os"
+
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"os"
 )
 
 func GetConnection() (*mongo.Client, error) {
