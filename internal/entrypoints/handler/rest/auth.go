@@ -38,13 +38,13 @@ func (handler *AuthHandler) authenticate(c *gin.Context) {
 		return
 	}
 
-	result, err := handler.authenticateUser.Execute(c, authUserRequest)
+	result, err := handler.authenticateUser.Execute(authUserRequest)
 	if err != nil || !result {
-		c.JSON(http.StatusUnauthorized, map[string]any{"message": "wrong email or password"})
+		c.JSON(http.StatusUnauthorized, map[string]any{"status": "error", "message": "wrong user data"})
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	c.JSON(http.StatusOK, map[string]any{"status": "ok", "message": "user authenticated successfully"})
 }
 
 func (handler *AuthHandler) getUserDataFromRequest(c *gin.Context) (*contracts.AuthUserRequest, error) {
