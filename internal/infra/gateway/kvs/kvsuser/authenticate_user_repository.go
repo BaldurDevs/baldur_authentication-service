@@ -1,12 +1,11 @@
 package kvsuser
 
 import (
-	"context"
-	"encoding/base64"
-
 	"authentication/internal/core/gateway"
 	"authentication/internal/core/gateway/dto"
 	"authentication/internal/infra/gateway/kvs/config"
+	"context"
+	"encoding/base64"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
