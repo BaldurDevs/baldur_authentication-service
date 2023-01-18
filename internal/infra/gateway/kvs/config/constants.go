@@ -3,5 +3,5 @@ package config
 import "time"
 
 const (
-	TimeOutInterval = 3 * time.Second
+	TimeOutInterval = 5 * time.Second
 )

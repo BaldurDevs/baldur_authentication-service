@@ -5,11 +5,11 @@ import (
 	"authentication/internal/core/gateway"
 	"authentication/internal/core/gateway/dto"
 	"authentication/internal/entrypoints/handler/contracts"
-	"github.com/gin-gonic/gin"
+	"errors"
 )
 
 type AuthenticateUser interface {
-	Execute(ctx *gin.Context, user *contracts.AuthUserRequest) (bool, error)
+	Execute(user *contracts.AuthUserRequest) (bool, error)
 }
 
 func AuthenticateUserFactory() AuthenticateUser {
@@ -30,11 +30,16 @@ type authenticateUser struct {
 	authenticationRepository gateway.AuthenticationUserRepository
 }
 
-func (useCase *authenticateUser) Execute(ctx *gin.Context, user *contracts.AuthUserRequest) (bool, error) {
+func (useCase *authenticateUser) Execute(user *contracts.AuthUserRequest) (bool, error) {
 	// TODO: Correct this map
 	userData := &dto.UserAuthData{
 		Email:    user.Email,
+		Name:     user.Name,
 		Password: user.Password,
+	}
+
+	if err := useCase.validateUserData(user); err != nil {
+		return false, err
 	}
 
 	result, err := useCase.authenticationRepository.Execute(userData)
@@ -43,4 +48,11 @@ func (useCase *authenticateUser) Execute(ctx *gin.Context, user *contracts.AuthU
 	}
 
 	return result, nil
+}
+
+func (useCase *authenticateUser) validateUserData(user *contracts.AuthUserRequest) error {
+	if user.Email == "" && user.Name == "" {
+		return errors.New("user email and name empty")
+	}
+	return nil
 }
