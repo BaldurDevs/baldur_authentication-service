@@ -18,7 +18,7 @@ func main() {
 	log.Info("configuring application port " + port)
 
 	if err := run(port); err != nil {
-		log.Errorf("error running server", err)
+		log.Error("error running server", err)
 	}
 }
 
