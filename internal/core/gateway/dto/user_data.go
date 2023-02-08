@@ -23,7 +23,5 @@ func (dto *UserAuthData) encodePassword() string {
 }
 
 func (dto *UserAuthData) DecodePassword() string {
-	//decodedPassword, err := base64.StdEncoding.DecodeString(dto.Password)
-
 	return base64.StdEncoding.EncodeToString([]byte(dto.Password))
 }

@@ -36,8 +36,13 @@ func GetConnection() (*mongo.Client, error) {
 	return client, nil
 }
 
-func CloseConnection(ctx context.Context, client *mongo.Client) {
-	if err := client.Disconnect(ctx); err != nil {
-		panic(err)
+func CloseConnection(ctx context.Context, client *mongo.Client) error {
+	if client == nil {
+		return errors.New("null mongo client, unabled to close connection")
 	}
+
+	if err := client.Disconnect(ctx); err != nil {
+		return err
+	}
+	return nil
 }
