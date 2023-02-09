@@ -6,6 +6,7 @@ import (
 	"authentication/internal/infra/gateway/kvs/config"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func NewAuthenticationUserRepository() gateway.AuthenticationUserRepository {
@@ -18,7 +19,7 @@ func (repository *authenticationUserRepository) Execute(userAuthData *dto.UserAu
 	storedUser, err := repository.searchUser(userAuthData)
 
 	if err != nil {
-		// TODO: Apierror error al buscar usuario
+		// TODO: Apierror error al buscar usuario -->  "github.com/BaldurDevs/baldur_go-library/pkg/goutils/apierrors"
 		return false, err
 	}
 
@@ -30,7 +31,12 @@ func (repository *authenticationUserRepository) searchUser(userData *dto.UserAut
 
 	ctx, cancel := context.WithTimeout(context.Background(), config.TimeOutInterval)
 	defer cancel()
-	defer config.CloseConnection(ctx, client)
+	defer func(ctx context.Context, client *mongo.Client) {
+		err := config.CloseConnection(ctx, client)
+		if err != nil {
+			return
+		}
+	}(ctx, client)
 
 	collection := client.Database(Database).Collection("users")
 

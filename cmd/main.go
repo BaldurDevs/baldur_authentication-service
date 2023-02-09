@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/BaldurDevs/baldur_go-library/pkg/http/baserest"
 	"os"
 
 	"authentication/internal/entrypoints/handler/rest"
@@ -18,7 +19,7 @@ func main() {
 	log.Info("configuring application port " + port)
 
 	if err := run(port); err != nil {
-		log.Errorf("error running server", err)
+		log.Error("error running server", err)
 	}
 }
 
@@ -26,11 +27,11 @@ func run(port string) error {
 	log.Info("loading routes")
 	router := gin.Default()
 
-	pingHandler := rest.PingHandlerFactory()
-	pingHandler.RegisterRouters(router)
+	pingHandler := baserest.PingHandlerFactory()
+	pingHandler.RegisterRoutes(router)
 
 	authHandler := rest.AuthHandlerFactory()
-	authHandler.RegisterRouters(router)
+	authHandler.RegisterRoutes(router)
 
 	log.Info("run application...")
 	return router.Run(":" + port)
